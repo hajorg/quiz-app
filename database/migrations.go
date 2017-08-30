@@ -4,7 +4,8 @@ import (
 	"database/sql"
 )
 
-func CreateAndOpenDb(name string) {
+// CreateDatabase creates a database and add tables if not exists
+func CreateDatabase(name string) {
 	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/")
 	if err != nil {
 		panic(err)
