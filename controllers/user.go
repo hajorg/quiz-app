@@ -47,7 +47,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.Connect()
+	db := database.Connect("quiz")
 	defer db.Close()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser["password"].(string)), 10)

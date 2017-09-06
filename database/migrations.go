@@ -84,7 +84,7 @@ func CreateDatabase(name string) {
 		CREATE PROCEDURE add_created_at_col()
 			BEGIN 
 				IF NOT EXISTS 
-					(SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = 'user' AND TABLE_SCHEMA = 'quiz' AND COLUMN_NAME = 'created_at')
+					(SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = 'user' AND TABLE_SCHEMA = '` + name + `' AND COLUMN_NAME = 'created_at')
 				THEN 
 					ALTER TABLE user ADD created_at DATETIME NOT NULL;
 				END IF;
@@ -108,7 +108,7 @@ func CreateDatabase(name string) {
 		CREATE PROCEDURE add_updated_at_col()
 			BEGIN
 				IF NOT EXISTS (
-					SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = 'user' AND TABLE_SCHEMA = 'quiz' AND COLUMN_NAME = 'updated_at'
+					SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = 'user' AND TABLE_SCHEMA = '` + name + `' AND COLUMN_NAME = 'updated_at'
 				)
 				THEN ALTER TABLE user ADD updated_at DATETIME NOT NULL;
 				END IF;
@@ -132,7 +132,7 @@ func CreateDatabase(name string) {
 		CREATE PROCEDURE add_email_col()
 			BEGIN
 				IF NOT EXISTS (
-					SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = 'user' AND TABLE_SCHEMA = 'quiz' AND COLUMN_NAME = 'email'
+					SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = 'user' AND TABLE_SCHEMA = '` + name + `' AND COLUMN_NAME = 'email'
 				)
 				THEN ALTER TABLE user ADD email VARCHAR(50) NOT NULL UNIQUE;
 				END IF;
