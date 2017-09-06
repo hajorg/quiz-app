@@ -8,6 +8,7 @@ import (
 	"quiz-app/database"
 	"quiz-app/utils"
 	"quiz-app/validation"
+	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -24,17 +25,23 @@ type UserInput struct {
 // CreateUser creates a new user
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	fmt.Println(r, "here")
-	var user UserInput
 	body, err := ioutil.ReadAll(r.Body)
+
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 	defer r.Body.Close()
-	var newUser map[string]interface{}
-	json.Unmarshal(body, &user)
-	json.Unmarshal(body, &newUser)
-	fmt.Println(newUser)
+	// holds form data
+	newUser := map[string]interface{}{}
+	// check if post data is urlencoded or json object
+	if len(r.Form) > 0 {
+		for key, val := range r.Form {
+			newUser[key] = strings.Join(val, "")
+		}
+	} else {
+		json.Unmarshal(body, &newUser)
+	}
+
 	validationError := validation.Validator(w, newUser)
 	if validationError == false {
 		return
@@ -43,7 +50,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	db := database.Connect()
 	defer db.Close()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser["password"].(string)), 10)
 	if err != nil {
 		panic(err)
 	}
@@ -54,25 +61,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	defer smt.Close()
 
-	res, err := smt.Exec(nil, user.Username, user.Email, hashedPassword, time.Now(), time.Now())
+	res, err := smt.Exec(nil, newUser["username"], newUser["email"], hashedPassword, time.Now(), time.Now())
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(400)
-		error := utils.Error{
-			Error: err.Error(),
-		}
-		json.NewEncoder(w).Encode(error)
+		utils.BadRequest(w, err)
 		return
 	}
 
 	lastID, err := res.LastInsertId()
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(400)
-		error := utils.Error{
-			Error: err.Error(),
-		}
-		json.NewEncoder(w).Encode(error)
+		utils.BadRequest(w, err)
 		return
 	}
 
@@ -94,7 +91,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	fmt.Println(tokenString)
 	newUser["token"] = tokenString
 	delete(newUser, "password")
 	json.NewEncoder(w).Encode(newUser)
