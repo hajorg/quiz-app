@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -48,7 +49,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.Connect("quiz")
+	var dbName string
+	if flag.Lookup("test.v") == nil {
+		dbName = "quiz"
+	} else {
+		dbName = "quiztest"
+	}
+	db := database.Connect(dbName)
 	defer db.Close()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser["password"].(string)), 10)
