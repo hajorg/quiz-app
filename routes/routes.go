@@ -30,6 +30,12 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 			Pattern: "/user",
 			Method:  "POST",
 		},
+		Route{
+			Name:    "user",
+			Handler: controllers.Login,
+			Pattern: "/login",
+			Method:  "POST",
+		},
 	}
 
 	for _, route := range routes {

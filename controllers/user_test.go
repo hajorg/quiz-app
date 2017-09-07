@@ -65,6 +65,38 @@ func TestUserHandlerCreateSuccess(t *testing.T) {
 	if status := rr.Code; status != http.StatusCreated {
 		t.Errorf("Error occurred. Expected %v but got %v status code", http.StatusCreated, status)
 	}
+}
+
+func TestUserHandlerLoginSuccess(t *testing.T) {
+	data := `{"username": "john", "password": "mypassword"}`
+	reader := strings.NewReader(data)
+	req, _ := http.NewRequest("POST", "login", reader)
+
+	rr := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(controllers.Login)
+	handler.ServeHTTP(rr, req)
+	t.Log(rr.Code, rr.Body)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("Error occurred. Expected %v but got %v status code", http.StatusOK, status)
+	}
+}
+
+func TestUserHandlerLoginFail(t *testing.T) {
+	data := `{"username": "johnkl", "password": "mypassword"}`
+	reader := strings.NewReader(data)
+	req, _ := http.NewRequest("POST", "login", reader)
+
+	rr := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(controllers.Login)
+	handler.ServeHTTP(rr, req)
+	t.Log(rr.Code, rr.Body)
+
+	if status := rr.Code; status != http.StatusUnauthorized {
+		t.Errorf("Error occurred. Expected %v but got %v status code", http.StatusUnauthorized, status)
+	}
 
 	db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/quiztest")
 	db.Exec("DROP DATABASE IF EXISTS quiztest")
