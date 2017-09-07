@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"quiz-app/database"
 	"quiz-app/routes"
@@ -16,5 +17,5 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", routes.Routers)
-	http.ListenAndServe(":8080", mux)
+	fmt.Println(http.ListenAndServe(":8080", mux))
 }

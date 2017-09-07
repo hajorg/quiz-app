@@ -25,12 +25,7 @@ type UserInput struct {
 // CreateUser creates a new user
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	body, err := ioutil.ReadAll(r.Body)
 
-	if err != nil {
-		fmt.Fprintln(w, err)
-	}
-	defer r.Body.Close()
 	// holds form data
 	newUser := map[string]interface{}{}
 	// check if post data is urlencoded or json object
@@ -39,6 +34,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			newUser[key] = strings.Join(val, "")
 		}
 	} else {
+		body, err := ioutil.ReadAll(r.Body)
+
+		if err != nil {
+			fmt.Fprintln(w, err)
+		}
+		defer r.Body.Close()
 		json.Unmarshal(body, &newUser)
 	}
 
@@ -47,7 +48,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.Connect("quiztest")
+	db := database.Connect("quiz")
 	defer db.Close()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser["password"].(string)), 10)
