@@ -35,28 +35,8 @@ func init() {
 	database.CreateDatabase("quiztest")
 }
 
-func TestUserHandlerCreateSuccess(t *testing.T) {
-	data := `{"username": "john", "email": "john@yahoo.com", "password": "mypassword"}`
-	reader := strings.NewReader(data)
-	req, _ := http.NewRequest("POST", "user", reader)
-
-	rr := httptest.NewRecorder()
-
-	handler := http.HandlerFunc(controllers.CreateUser)
-	handler.ServeHTTP(rr, req)
-	t.Log(rr.Code)
-
-	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("Error occurred. Expected %v but got %v status code", http.StatusCreated, status)
-	}
-
-	db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/quiztest")
-	db.Exec("DROP DATABASE IF EXISTS quiztest")
-	db.Close()
-}
-
 func TestUserHandlerCreateFail(t *testing.T) {
-	data := `{"username": "john", "email": "john@yahoo.com", "password": ""}`
+	data := `{"username": "johny", "email": "johny@yahoo.com", "password": ""}`
 	reader := strings.NewReader(data)
 	req, _ := http.NewRequest("POST", "user", reader)
 
@@ -68,6 +48,22 @@ func TestUserHandlerCreateFail(t *testing.T) {
 
 	if status := rr.Code; status != http.StatusUnprocessableEntity {
 		t.Errorf("Error occurred. Expected %v but got %v status code", http.StatusUnprocessableEntity, status)
+	}
+}
+
+func TestUserHandlerCreateSuccess(t *testing.T) {
+	data := `{"username": "john", "email": "john@yahoo.com", "password": "mypassword"}`
+	reader := strings.NewReader(data)
+	req, _ := http.NewRequest("POST", "user", reader)
+
+	rr := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(controllers.CreateUser)
+	handler.ServeHTTP(rr, req)
+	t.Log(rr.Code, rr.Body)
+
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("Error occurred. Expected %v but got %v status code", http.StatusCreated, status)
 	}
 
 	db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/quiztest")

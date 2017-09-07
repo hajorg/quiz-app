@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"quiz-app/database"
 	"quiz-app/utils"
 	"quiz-app/validation"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -92,7 +94,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			ExpiresAt: 15000,
 		},
 	}
-	mySigningKey := []byte("super-secret")
+
+	godotenv.Load()
+
+	key := os.Getenv("SECRET")
+	mySigningKey := []byte(key)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(mySigningKey)
 	if err != nil {
