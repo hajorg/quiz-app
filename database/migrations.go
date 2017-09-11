@@ -156,4 +156,39 @@ func CreateDatabase(name string) {
 	if err != nil {
 		panic(err)
 	}
+
+	_, err = db.Exec(
+		`CREATE TABLE IF NOT EXISTS role(
+			id INT NOT NULL PRIMARY KEY UNIQUE AUTO_INCREMENT,
+			title VARCHAR(50) NOT NULL,
+			description VARCHAR(255)
+		)
+	`)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec("DROP PROCEDURE IF EXISTS add_role_id_user")
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec(`
+		CREATE PROCEDURE add_role_id_user()
+			BEGIN
+				IF NOT EXISTS(
+					SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME='user' AND TABLE_SCHEMA='` + name + `' AND COLUMN_NAME='role_id'
+				)
+				THEN ALTER TABLE user ADD role_id INT NOT NULL DEFAULT 2;
+				END IF;
+			END;
+	`)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec("CALL add_role_id_user()")
+	if err != nil {
+		panic(err)
+	}
 }
