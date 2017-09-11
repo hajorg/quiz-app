@@ -191,4 +191,33 @@ func CreateDatabase(name string) {
 	if err != nil {
 		panic(err)
 	}
+
+	_, err = db.Exec(
+		`CREATE TABLE IF NOT EXISTS categories(
+			id INT NOT NULL PRIMARY KEY UNIQUE AUTO_INCREMENT,
+			title VARCHAR(50) NOT NULL UNIQUE,
+			description VARCHAR(255)
+		)
+	`)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec(`
+	CREATE PROCEDURE add_category_id_subject()
+		BEGIN
+			IF NOT EXISTS(
+				SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME='subjects' AND TABLE_SCHEMA='` + name + `' AND COLUMN_NAME='category_id'
+			)
+			THEN
+				ALTER TABLE subjects ADD category_id INT NOT NULL DEFAULT 1;
+				ALTER TABLE subjects ADD FOREIGN KEY (category_id) REFERENCES categories(id);
+			END IF;
+		END;
+	`)
+
+	_, err = db.Exec("CALL add_category_id_subject()")
+	if err != nil {
+		panic(err)
+	}
 }
