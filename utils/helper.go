@@ -3,18 +3,20 @@ package utils
 import (
 	"fmt"
 	"os"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
 )
 
 // CreateToken creates token on successful login or signup
-func CreateToken(userID int64, username string) string {
+func CreateToken(userID, roleID int64, username string) string {
 	claims := MyCustomClaims{
 		userID,
 		username,
+		roleID,
 		jwt.StandardClaims{
-			ExpiresAt: 15000,
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
 	}
 
@@ -35,5 +37,6 @@ func CreateToken(userID int64, username string) string {
 type MyCustomClaims struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`
+	RoleID   int64  `json:"roleId"`
 	jwt.StandardClaims
 }

@@ -85,10 +85,23 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	stmt, err := db.Prepare("SELECT id, username, email, role_id FROM user WHERE id = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	var id int
+	var username string
+	var email string
+	var roleID int
+
+	err = stmt.QueryRow(lastID).Scan(&id, &username, &email, &roleID)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
 
-	tokenString := utils.CreateToken(lastID, newUser["username"].(string))
+	tokenString := utils.CreateToken(lastID, int64(roleID), newUser["username"].(string))
 
 	newUser["token"] = tokenString
 	delete(newUser, "password")
@@ -122,7 +135,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	db := database.Connect(dbName)
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT id, username, password FROM user WHERE username = ?")
+	stmt, err := db.Prepare("SELECT id, username, password, role_id FROM user WHERE username = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -131,8 +144,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var id int
 	var username string
 	var password string
+	var roleID int
 
-	err = stmt.QueryRow(user["username"]).Scan(&id, &username, &password)
+	err = stmt.QueryRow(user["username"]).Scan(&id, &username, &password, &roleID)
 	if err != nil {
 		utils.UnauthorizedError(w, "Incorrect username and password combination")
 		return
@@ -147,8 +161,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	tokenString := utils.CreateToken(int64(id), username)
+	tokenString := utils.CreateToken(int64(id), int64(roleID), username)
 	user["token"] = tokenString
+	delete(user, "password")
 
 	json.NewEncoder(w).Encode(user)
 }
