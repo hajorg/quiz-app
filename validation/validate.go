@@ -24,6 +24,14 @@ func Validator(w http.ResponseWriter, data map[string]interface{}) bool {
 			"required": "1",
 			"min":      "6",
 		},
+		"title": {
+			"required": "1",
+			"min":      "2",
+			"max":      "50",
+		},
+		"description": {
+			"max": "255",
+		},
 	}
 
 	// loop through the key of the outer map
