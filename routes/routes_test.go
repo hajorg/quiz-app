@@ -2,14 +2,17 @@ package routes_test
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"quiz-app/database"
 	"quiz-app/routes"
+	"quiz-app/utils"
 	"strings"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -93,6 +96,68 @@ func TestUserRouteSuccess(t *testing.T) {
 	handler.ServeHTTP(rr, reg)
 
 	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("wrong status code: expected %v but got %v", http.StatusCreated, status)
+	}
+}
+
+func TestCreateCategoryNoTokenFail(t *testing.T) {
+	newJson := `{"title": "general", "description": "General stuff"}`
+	reader := strings.NewReader(newJson)
+	req, err := http.NewRequest("POST", "/category", reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res := httptest.NewRecorder()
+	handler := http.HandlerFunc(routes.Routers)
+	handler.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusUnauthorized {
+		t.Errorf("wrong status code: expected %v but got %v", http.StatusUnauthorized, status)
+	}
+}
+
+func TestCreateCategoryPermissionFail(t *testing.T) {
+	godotenv.Load()
+	newJson := `{"title": "general", "description": "General stuff"}`
+	reader := strings.NewReader(newJson)
+	req, err := http.NewRequest("POST", "/category", reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := utils.CreateToken(100, 2, "james")
+	req.Header.Set("Authorization", token)
+
+	res := httptest.NewRecorder()
+	handler := http.HandlerFunc(routes.Routers)
+	handler.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusForbidden {
+		t.Errorf("wrong status code: expected %v but got %v", http.StatusForbidden, status)
+	}
+
+	var body map[string]string
+	json.NewDecoder(res.Body).Decode(&body)
+	if body["error"] != "You are not permitted to perform this action" {
+		t.Errorf("wrong status code: expected `%s` but got %v", "You are not permitted to perform this action", body["error"])
+	}
+}
+
+func TestCreateCategorySuccess(t *testing.T) {
+	godotenv.Load()
+	newJson := `{"title": "general", "description": "General stuff"}`
+	reader := strings.NewReader(newJson)
+	req, err := http.NewRequest("POST", "/category", reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := utils.CreateToken(100, 1, "james")
+	req.Header.Set("Authorization", token)
+
+	res := httptest.NewRecorder()
+	handler := http.HandlerFunc(routes.Routers)
+	handler.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusCreated {
 		t.Errorf("wrong status code: expected %v but got %v", http.StatusCreated, status)
 	}
 
