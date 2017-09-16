@@ -34,7 +34,7 @@ func CreateDatabase(name string) {
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS subjects(
 			id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-			name VARCHAR(50) NOT NULL
+			name VARCHAR(50) NOT NULL UNIQUE
 		)`)
 	if err != nil {
 		panic(err)

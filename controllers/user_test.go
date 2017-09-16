@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"quiz-app/controllers"
+	"quiz-app/utils"
 	"strings"
 	"testing"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func TestUserHandlerCreateFail(t *testing.T) {
-	_ = DbTestInit()
+	utils.DbTestInit()
 	data := `{"username": "johny", "email": "johny@yahoo.com", "password": ""}`
 	reader := strings.NewReader(data)
 	req, _ := http.NewRequest("POST", "user", reader)
@@ -28,7 +29,7 @@ func TestUserHandlerCreateFail(t *testing.T) {
 }
 
 func TestUserHandlerCreateSuccess(t *testing.T) {
-	_ = DbTestInit()
+	utils.DbTestInit()
 	data := `{"username": "john", "email": "john@yahoo.com", "password": "mypassword"}`
 	reader := strings.NewReader(data)
 	req, _ := http.NewRequest("POST", "user", reader)
@@ -45,7 +46,7 @@ func TestUserHandlerCreateSuccess(t *testing.T) {
 }
 
 func TestUserHandlerLoginSuccess(t *testing.T) {
-	DbTestInit()
+	utils.DbTestInit()
 	data := `{"username": "john", "password": "mypassword"}`
 	reader := strings.NewReader(data)
 	req, _ := http.NewRequest("POST", "login", reader)
@@ -62,7 +63,7 @@ func TestUserHandlerLoginSuccess(t *testing.T) {
 }
 
 func TestUserHandlerLoginFail(t *testing.T) {
-	db := DbTestInit()
+	db := utils.DbTestInit()
 	data := `{"username": "johnkl", "password": "mypassword"}`
 	reader := strings.NewReader(data)
 	req, _ := http.NewRequest("POST", "login", reader)

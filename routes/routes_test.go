@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	db  *sql.DB
-	err error
+	db      *sql.DB
+	err     error
+	baseURL = "/api/v1"
 )
 
 func init() {
@@ -53,7 +54,7 @@ func TestIndexRoute(t *testing.T) {
 }
 
 func TestInvalidRoute(t *testing.T) {
-	req, err := http.NewRequest("GET", "/hello", nil)
+	req, err := http.NewRequest("GET", baseURL+"/hello", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +70,7 @@ func TestInvalidRoute(t *testing.T) {
 func TestUserRouteBadEmailFail(t *testing.T) {
 	newJson := `{"username": "jameskd", "email": "jamesjd@gmail.com", "password": ""}`
 	reader := strings.NewReader(newJson)
-	reg, err := http.NewRequest("POST", "/user", reader)
+	reg, err := http.NewRequest("POST", baseURL+"/user", reader)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +87,7 @@ func TestUserRouteBadEmailFail(t *testing.T) {
 func TestUserRouteSuccess(t *testing.T) {
 	newJson := `{"username": "james", "email": "james@gmail.com", "password": "password"}`
 	reader := strings.NewReader(newJson)
-	reg, err := http.NewRequest("POST", "/user", reader)
+	reg, err := http.NewRequest("POST", baseURL+"/user", reader)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +104,7 @@ func TestUserRouteSuccess(t *testing.T) {
 func TestCreateCategoryNoTokenFail(t *testing.T) {
 	newJson := `{"title": "general", "description": "General stuff"}`
 	reader := strings.NewReader(newJson)
-	req, err := http.NewRequest("POST", "/category", reader)
+	req, err := http.NewRequest("POST", baseURL+"/category", reader)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +121,7 @@ func TestCreateCategoryPermissionFail(t *testing.T) {
 	godotenv.Load()
 	newJson := `{"title": "general", "description": "General stuff"}`
 	reader := strings.NewReader(newJson)
-	req, err := http.NewRequest("POST", "/category", reader)
+	req, err := http.NewRequest("POST", baseURL+"/category", reader)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,7 +147,7 @@ func TestCreateCategorySuccess(t *testing.T) {
 	godotenv.Load()
 	newJson := `{"title": "general", "description": "General stuff"}`
 	reader := strings.NewReader(newJson)
-	req, err := http.NewRequest("POST", "/category", reader)
+	req, err := http.NewRequest("POST", baseURL+"/category", reader)
 	if err != nil {
 		t.Fatal(err)
 	}

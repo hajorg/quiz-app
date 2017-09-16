@@ -17,6 +17,8 @@ type Route struct {
 
 type routes []Route
 
+var baseURL = "/api/v1"
+
 // Routers matches incoming request to the appropriate handlers
 func Routers(w http.ResponseWriter, r *http.Request) {
 	routes := routes{
@@ -29,21 +31,28 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 		Route{
 			Name:    "user",
 			Handler: controllers.CreateUser,
-			Pattern: "/user",
+			Pattern: baseURL + "/user",
 			Method:  "POST",
 		},
 		Route{
 			Name:    "user",
 			Handler: controllers.Login,
-			Pattern: "/login",
+			Pattern: baseURL + "/login",
 			Method:  "POST",
 		},
 		Route{
 			Name:       "categories",
 			Handler:    controllers.CreateCategory,
-			Pattern:    "/category",
+			Pattern:    baseURL + "/category",
 			Method:     "POST",
 			Middleware: middlewares.AuthMiddleware(middlewares.AuthAdminMiddleware(http.HandlerFunc(controllers.CreateCategory))),
+		},
+		Route{
+			Name:       "subjects",
+			Handler:    controllers.CreateSubject,
+			Pattern:    baseURL + "/subject",
+			Method:     "POST",
+			Middleware: middlewares.AuthMiddleware(http.HandlerFunc(controllers.CreateSubject)),
 		},
 	}
 

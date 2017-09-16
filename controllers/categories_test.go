@@ -1,12 +1,10 @@
 package controllers_test
 
 import (
-	"database/sql"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"quiz-app/controllers"
-	"quiz-app/database"
+	"quiz-app/utils"
 	"strings"
 	"testing"
 
@@ -14,8 +12,7 @@ import (
 )
 
 func TestCreateCategorySuccess(t *testing.T) {
-	db := DbTestInit()
-	fmt.Println("start2")
+	db := utils.DbTestInit()
 	reader := strings.NewReader(`{"title": "testTitle", "description": "testing things"}`)
 	req, err := http.NewRequest("POST", "category", reader)
 	if err != nil {
@@ -36,22 +33,4 @@ func TestCreateCategorySuccess(t *testing.T) {
 		panic(err)
 	}
 	defer db.Close()
-}
-
-func DbTestInit() *sql.DB {
-	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-	_, err = db.Exec("CREATE DATABASE IF NOT EXISTS quiztest")
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = db.Exec("USE quiztest")
-	if err != nil {
-		panic(err)
-	}
-	database.CreateDatabase("quiztest")
-	return db
 }
