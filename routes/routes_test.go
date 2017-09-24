@@ -3,6 +3,7 @@ package routes_test
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"quiz-app/routes"
@@ -208,5 +209,56 @@ func TestCreateSubjectRouteSuccess(t *testing.T) {
 
 	if status := res.Code; status != http.StatusCreated {
 		t.Errorf("wrong status code: expected %v but got %v", http.StatusCreated, status)
+	}
+
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+}
+
+func TestCreateQuestionRouteSuccess(t *testing.T) {
+	db := utils.DbTestInit()
+	defer db.Close()
+
+	stmt, err := db.Prepare("INSERT INTO categories(id, title, description) VALUES(?, ?, ?)")
+	checkError(err)
+
+	defer stmt.Close()
+	result, err := stmt.Exec(nil, "general", "General stuff")
+	checkError(err)
+	lastID, _ := result.LastInsertId()
+
+	stmt, err = db.Prepare("INSERT INTO subjects(id, name, category_id) VALUES(?, ?, ?)")
+	checkError(err)
+	_, err = stmt.Exec(nil, "English", lastID)
+	checkError(err)
+
+	reader := strings.NewReader(`{"subject_id": ` + fmt.Sprint(lastID) + `, "content": "What is a noun?"}`)
+	req, _ := http.NewRequest("POST", baseURL+"/question", reader)
+	res := httptest.NewRecorder()
+
+	token := utils.CreateToken(100, 1, "james")
+	req.Header.Set("Authorization", token)
+
+	handler := http.HandlerFunc(routes.Routers)
+	handler.ServeHTTP(res, req)
+	t.Log(res)
+
+	if status := res.Code; status != http.StatusCreated {
+		t.Errorf("wrong status code: expected %v but got %v", http.StatusCreated, status)
+	}
+
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+}
+
+func checkError(err error) {
+	if err != nil {
+		panic(err)
 	}
 }

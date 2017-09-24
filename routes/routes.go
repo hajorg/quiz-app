@@ -61,6 +61,13 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 			Method:     "POST",
 			Middleware: middlewares.AuthMiddleware(http.HandlerFunc(controllers.CreateQuestion)),
 		},
+		Route{
+			Name:       "options",
+			Handler:    controllers.CreateOption,
+			Pattern:    baseURL + "/option",
+			Method:     "POST",
+			Middleware: middlewares.AuthMiddleware(http.HandlerFunc(controllers.CreateOption)),
+		},
 	}
 
 	for _, route := range routes {
