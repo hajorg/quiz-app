@@ -34,7 +34,16 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(body, &subject)
 	}
 
-	validationError := validation.Validator(w, subject)
+	validationError := validation.Validator(w, subject, map[string](map[string]string){
+		"name": {
+			"required": "1",
+			"min":      "2",
+			"max":      "50",
+		},
+		"category_id": {
+			"required": "1",
+		},
+	})
 	if validationError == false {
 		return
 	}

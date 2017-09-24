@@ -29,7 +29,16 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 	}
 
-	valid := validation.Validator(w, category)
+	valid := validation.Validator(w, category, map[string](map[string]string){
+		"title": {
+			"required": "1",
+			"min":      "2",
+			"max":      "50",
+		},
+		"description": {
+			"max": "255",
+		},
+	})
 	if valid == false {
 		return
 	}

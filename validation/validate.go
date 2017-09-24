@@ -10,38 +10,8 @@ import (
 )
 
 // Validator validates the request body(data) and writes to w if err
-func Validator(w http.ResponseWriter, data map[string]interface{}) bool {
-	validation := map[string](map[string]string){
-		"username": {
-			"required": "1",
-			"max":      "20",
-		},
-		"email": {
-			"required": "1",
-			"pattern":  "1",
-		},
-		"password": {
-			"required": "1",
-			"min":      "6",
-		},
-		"title": {
-			"required": "1",
-			"min":      "2",
-			"max":      "50",
-		},
-		"description": {
-			"max": "255",
-		},
-		"name": {
-			"required": "1",
-			"min":      "2",
-			"max":      "50",
-		},
-		"category_id": {
-			"required": "1",
-		},
-	}
-
+// the validation arg is a map of things to validate against
+func Validator(w http.ResponseWriter, data map[string]interface{}, validation map[string](map[string]string)) bool {
 	// loop through the key of the outer map
 	for attr, validate := range validation {
 		// loop the value of the other loop with is also a map(inner map)

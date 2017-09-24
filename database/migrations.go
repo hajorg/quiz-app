@@ -94,7 +94,7 @@ func CreateDatabase(name string) {
 		panic(err)
 	}
 
-	_, err = db.Exec("call add_created_at_col()")
+	_, err = db.Exec("CALL add_created_at_col()")
 	if err != nil {
 		panic(err)
 	}

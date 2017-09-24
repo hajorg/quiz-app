@@ -54,7 +54,20 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(body, &newUser)
 	}
 
-	validationError := validation.Validator(w, newUser)
+	validationError := validation.Validator(w, newUser, map[string](map[string]string){
+		"username": {
+			"required": "1",
+			"max":      "20",
+		},
+		"email": {
+			"required": "1",
+			"pattern":  "1",
+		},
+		"password": {
+			"required": "1",
+			"min":      "6",
+		},
+	})
 	if validationError == false {
 		return
 	}
@@ -127,7 +140,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(body, &user)
 	}
 
-	validationError := validation.Validator(w, user)
+	validationError := validation.Validator(w, user, map[string](map[string]string){
+		"username": {
+			"required": "1",
+			"max":      "20",
+		},
+		"password": {
+			"required": "1",
+			"min":      "6",
+		},
+	})
 	if validationError == false {
 		return
 	}

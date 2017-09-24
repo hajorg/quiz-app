@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"quiz-app/database"
 	"quiz-app/routes"
 	"quiz-app/utils"
 	"strings"
@@ -20,24 +19,6 @@ var (
 	err     error
 	baseURL = "/api/v1"
 )
-
-func init() {
-	db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/")
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = db.Exec("CREATE DATABASE IF NOT EXISTS quiztest")
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = db.Exec("USE quiztest")
-	if err != nil {
-		panic(err)
-	}
-	database.CreateDatabase("quiztest")
-}
 
 func TestIndexRoute(t *testing.T) {
 	req, err := http.NewRequest("GET", "/", nil)
@@ -54,6 +35,7 @@ func TestIndexRoute(t *testing.T) {
 }
 
 func TestInvalidRoute(t *testing.T) {
+	db := utils.DbTestInit()
 	req, err := http.NewRequest("GET", baseURL+"/hello", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -65,9 +47,15 @@ func TestInvalidRoute(t *testing.T) {
 	if status := w.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code; got %v but wanted %v", status, http.StatusNotFound)
 	}
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 }
 
 func TestUserRouteBadEmailFail(t *testing.T) {
+	db := utils.DbTestInit()
 	newJson := `{"username": "jameskd", "email": "jamesjd@gmail.com", "password": ""}`
 	reader := strings.NewReader(newJson)
 	reg, err := http.NewRequest("POST", baseURL+"/user", reader)
@@ -82,9 +70,15 @@ func TestUserRouteBadEmailFail(t *testing.T) {
 	if status := rr.Code; status != http.StatusUnprocessableEntity {
 		t.Errorf("wrong status code: expected %v but got %v", http.StatusUnprocessableEntity, status)
 	}
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 }
 
 func TestUserRouteSuccess(t *testing.T) {
+	db := utils.DbTestInit()
 	newJson := `{"username": "james", "email": "james@gmail.com", "password": "password"}`
 	reader := strings.NewReader(newJson)
 	reg, err := http.NewRequest("POST", baseURL+"/user", reader)
@@ -99,9 +93,15 @@ func TestUserRouteSuccess(t *testing.T) {
 	if status := rr.Code; status != http.StatusCreated {
 		t.Errorf("wrong status code: expected %v but got %v", http.StatusCreated, status)
 	}
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 }
 
 func TestCreateCategoryNoTokenFail(t *testing.T) {
+	db := utils.DbTestInit()
 	newJson := `{"title": "general", "description": "General stuff"}`
 	reader := strings.NewReader(newJson)
 	req, err := http.NewRequest("POST", baseURL+"/category", reader)
@@ -115,10 +115,16 @@ func TestCreateCategoryNoTokenFail(t *testing.T) {
 	if status := res.Code; status != http.StatusUnauthorized {
 		t.Errorf("wrong status code: expected %v but got %v", http.StatusUnauthorized, status)
 	}
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 }
 
 func TestCreateCategoryPermissionFail(t *testing.T) {
 	godotenv.Load()
+	db := utils.DbTestInit()
 	newJson := `{"title": "general", "description": "General stuff"}`
 	reader := strings.NewReader(newJson)
 	req, err := http.NewRequest("POST", baseURL+"/category", reader)
@@ -141,10 +147,16 @@ func TestCreateCategoryPermissionFail(t *testing.T) {
 	if body["error"] != "You are not permitted to perform this action" {
 		t.Errorf("wrong status code: expected `%s` but got %v", "You are not permitted to perform this action", body["error"])
 	}
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 }
 
-func TestCreateCategorySuccess(t *testing.T) {
+func TestCreateCategoryRouteSuccess(t *testing.T) {
 	godotenv.Load()
+	db := utils.DbTestInit()
 	newJson := `{"title": "general", "description": "General stuff"}`
 	reader := strings.NewReader(newJson)
 	req, err := http.NewRequest("POST", baseURL+"/category", reader)
@@ -162,7 +174,9 @@ func TestCreateCategorySuccess(t *testing.T) {
 		t.Errorf("wrong status code: expected %v but got %v", http.StatusCreated, status)
 	}
 
-	db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/quiztest")
-	db.Exec("DROP DATABASE IF EXISTS quiztest")
-	db.Close()
+	_, err = db.Exec("DROP DATABASE IF EXISTS quiztest")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 }
