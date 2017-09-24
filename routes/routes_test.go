@@ -180,3 +180,33 @@ func TestCreateCategoryRouteSuccess(t *testing.T) {
 	}
 	defer db.Close()
 }
+
+func TestCreateSubjectRouteSuccess(t *testing.T) {
+	db := utils.DbTestInit()
+	defer db.Close()
+
+	stmt, err := db.Prepare("INSERT INTO categories(id, title, description) VALUES(?, ?, ?)")
+	if err != nil {
+		panic(err)
+	}
+
+	defer stmt.Close()
+	_, err = stmt.Exec(nil, "general", "General stuff")
+	if err != nil {
+		panic(err)
+	}
+	reader := strings.NewReader(`{"name": "testTitle", "category_id": "1"}`)
+	req, _ := http.NewRequest("POST", baseURL+"/subject", reader)
+	res := httptest.NewRecorder()
+
+	token := utils.CreateToken(100, 1, "james")
+	req.Header.Set("Authorization", token)
+
+	handler := http.HandlerFunc(routes.Routers)
+	handler.ServeHTTP(res, req)
+	t.Log(res)
+
+	if status := res.Code; status != http.StatusCreated {
+		t.Errorf("wrong status code: expected %v but got %v", http.StatusCreated, status)
+	}
+}
