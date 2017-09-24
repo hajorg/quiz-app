@@ -21,7 +21,7 @@ func Validator(w http.ResponseWriter, data map[string]interface{}, validation ma
 				if attr == i {
 					switch key {
 					case "required":
-						if len(val.(string)) == 0 {
+						if len(fmt.Sprint(val)) == 0 {
 							return message(w, attr+" is required")
 						}
 					case "min":

@@ -56,7 +56,14 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer smt.Close()
-	categoryID, _ := strconv.Atoi(subject["category_id"].(string))
+	var categoryID int
+
+	if id, ok := subject["category_id"].(string); ok {
+		categoryID, _ = strconv.Atoi(id)
+	} else {
+		categoryID = int(subject["category_id"].(float64))
+	}
+
 	_, err = smt.Exec(nil, subject["name"], categoryID)
 	if err != nil {
 		utils.BadRequest(w, err)
