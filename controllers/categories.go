@@ -43,16 +43,7 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.Connect(dbName)
-	defer db.Close()
-
-	stmt, err := db.Prepare("INSERT INTO categories(id, title, description) VALUES(?, ?, ?)")
-	if err != nil {
-		panic(err)
-	}
-
-	defer stmt.Close()
-	_, err = stmt.Exec(nil, category["title"], category["description"])
+	_, err := database.Insert("categories", category)
 	if err != nil {
 		utils.BadRequest(w, err)
 		return

@@ -79,20 +79,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	newUser["password"] = hashedPassword
+	newUser["created_at"] = time.Now()
+	newUser["updated_at"] = time.Now()
 
-	smt, err := db.Prepare("INSERT INTO user(id, username, email, password, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?)")
-	if err != nil {
-		panic(err)
-	}
-	defer smt.Close()
-
-	res, err := smt.Exec(nil, newUser["username"], newUser["email"], hashedPassword, time.Now(), time.Now())
-	if err != nil {
-		utils.BadRequest(w, err)
-		return
-	}
-
-	lastID, err := res.LastInsertId()
+	lastID, err := database.Insert("user", newUser)
 	if err != nil {
 		utils.BadRequest(w, err)
 		return
@@ -118,6 +109,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	newUser["token"] = tokenString
 	delete(newUser, "password")
+	delete(newUser, "created_at")
+	delete(newUser, "updated_at")
 	json.NewEncoder(w).Encode(newUser)
 }
 

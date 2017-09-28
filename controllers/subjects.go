@@ -48,14 +48,6 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.Connect(dbName)
-	defer db.Close()
-
-	smt, err := db.Prepare("INSERT INTO subjects(id, name, category_id) VALUES(?, ?, ?)")
-	if err != nil {
-		panic(err)
-	}
-	defer smt.Close()
 	var categoryID int
 
 	if id, ok := subject["category_id"].(string); ok {
@@ -63,8 +55,9 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 	} else {
 		categoryID = int(subject["category_id"].(float64))
 	}
+	subject["category_id"] = categoryID
 
-	_, err = smt.Exec(nil, subject["name"], categoryID)
+	_, err := database.Insert("subjects", subject)
 	if err != nil {
 		utils.BadRequest(w, err)
 		return
