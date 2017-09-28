@@ -41,16 +41,7 @@ func CreateOption(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.Connect(dbName)
-	defer db.Close()
-
-	stmt, err := db.Prepare("INSERT INTO answers(id, question_id, content, correct) VALUES(?, ?, ?, ?)")
-	if err != nil {
-		panic(err)
-	}
-
-	defer stmt.Close()
-	_, err = stmt.Exec(nil, option["question_id"], option["content"], option["correct"])
+	_, err := database.Insert("answers", option)
 	if err != nil {
 		utils.BadRequest(w, err)
 		return

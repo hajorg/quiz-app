@@ -41,16 +41,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.Connect(dbName)
-	defer db.Close()
-
-	stmt, err := db.Prepare("INSERT INTO questions(id, subject_id, content) VALUES(?, ?, ?)")
-	if err != nil {
-		panic(err)
-	}
-
-	defer stmt.Close()
-	_, err = stmt.Exec(nil, question["subject_id"], question["content"])
+	_, err := database.Insert("questions", question)
 	if err != nil {
 		utils.BadRequest(w, err)
 		return
