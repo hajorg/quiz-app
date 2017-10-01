@@ -3,14 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"quiz-app/database"
 	"quiz-app/utils"
 	"quiz-app/validation"
-	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -38,21 +35,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	// holds form data
-	newUser := map[string]interface{}{}
-	// check if post data is urlencoded or json object
-	if len(r.Form) > 0 {
-		for key, val := range r.Form {
-			newUser[key] = strings.Join(val, "")
-		}
-	} else {
-		body, err := ioutil.ReadAll(r.Body)
-
-		if err != nil {
-			fmt.Fprintln(w, err)
-		}
-		defer r.Body.Close()
-		json.Unmarshal(body, &newUser)
-	}
+	newUser := utils.RequestData(r, w)
 
 	validationError := validation.Validator(w, newUser, map[string](map[string]string){
 		"username": {
@@ -117,21 +100,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 // Login login a registered user and give a token
 func Login(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	// holds form data
-	user := map[string]interface{}{}
-	// check if post data is urlencoded or json object
-	if len(r.Form) > 0 {
-		for key, val := range r.Form {
-			user[key] = strings.Join(val, "")
-		}
-	} else {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			fmt.Fprintln(w, err)
-		}
-		defer r.Body.Close()
-		json.Unmarshal(body, &user)
-	}
+
+	user := utils.RequestData(r, w)
 
 	validationError := validation.Validator(w, user, map[string](map[string]string){
 		"username": {

@@ -2,32 +2,17 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"quiz-app/database"
 	"quiz-app/utils"
 	"quiz-app/validation"
-	"strings"
 )
 
 // CreateQuestion creates a single question
 func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
-	question := map[string]interface{}{}
-	if len(r.Form) > 0 {
-		for key, val := range r.Form {
-			question[key] = strings.Join(val, "")
-		}
-	} else {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			fmt.Fprintln(w, err)
-		}
-		json.Unmarshal(body, &question)
-		defer r.Body.Close()
-	}
+	question := utils.RequestData(r, w)
 
 	valid := validation.Validator(w, question, map[string](map[string]string){
 		"subject_id": {

@@ -2,32 +2,17 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"quiz-app/database"
 	"quiz-app/utils"
 	"quiz-app/validation"
-	"strings"
 )
 
 // CreateOptions creates a single question
 func CreateOption(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
-	option := map[string]interface{}{}
-	if len(r.Form) > 0 {
-		for key, val := range r.Form {
-			option[key] = strings.Join(val, "")
-		}
-	} else {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			fmt.Fprintln(w, err)
-		}
-		json.Unmarshal(body, &option)
-		defer r.Body.Close()
-	}
+	option := utils.RequestData(r, w)
 
 	valid := validation.Validator(w, option, map[string](map[string]string){
 		"question_id": {
