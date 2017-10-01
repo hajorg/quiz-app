@@ -68,6 +68,12 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 			Method:     "POST",
 			Middleware: middlewares.AuthMiddleware(http.HandlerFunc(controllers.CreateOption)),
 		},
+		Route{
+			Name:    "subjects",
+			Handler: controllers.GetSubjects,
+			Pattern: baseURL + "/subject",
+			Method:  "GET",
+		},
 	}
 
 	for _, route := range routes {

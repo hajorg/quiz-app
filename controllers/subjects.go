@@ -53,3 +53,36 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(201)
 	fmt.Fprintf(w, `{"message": "Subject %s successfully created!"}`, subject["name"])
 }
+
+func GetSubjects(w http.ResponseWriter, r *http.Request) {
+	db := database.Connect(dbName)
+
+	rows, err := db.Query("SELECT * FROM subjects")
+	if err != nil {
+		panic(err)
+	}
+
+	var allSubjects []Subject
+
+	for {
+		if rows.Next() {
+			subject := Subject{}
+			rows.Scan(&subject.ID, &subject.Name, &subject.CategoryID)
+			allSubjects = append(allSubjects, subject)
+		} else {
+			break
+		}
+	}
+
+	defer rows.Close()
+
+	defer db.Close()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(allSubjects)
+}
+
+type Subject struct {
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	CategoryID int    `json:"category_id"`
+}
