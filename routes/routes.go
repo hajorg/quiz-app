@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"quiz-app/controllers"
 	"quiz-app/middlewares"
+	"regexp"
+	"strings"
 )
 
 // Route holds required data to match an incoming request
@@ -21,6 +23,10 @@ var baseURL = "/api/v1"
 
 // Routers matches incoming request to the appropriate handlers
 func Routers(w http.ResponseWriter, r *http.Request) {
+	numReg, _ := regexp.Compile("\\d+")
+	urlPaths := strings.Split(r.RequestURI, "/")
+	lastPath := urlPaths[len(urlPaths)-1]
+
 	routes := routes{
 		Route{
 			Name:    "home",
@@ -72,6 +78,12 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 			Name:    "subjects",
 			Handler: controllers.GetSubjects,
 			Pattern: baseURL + "/subject",
+			Method:  "GET",
+		},
+		Route{
+			Name:    "subject",
+			Handler: controllers.GetSubject,
+			Pattern: baseURL + "/subject/" + numReg.FindString(lastPath),
 			Method:  "GET",
 		},
 	}

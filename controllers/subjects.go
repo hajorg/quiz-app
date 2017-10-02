@@ -1,12 +1,15 @@
 package controllers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"quiz-app/database"
 	"quiz-app/utils"
 	"quiz-app/validation"
 	"strconv"
+	"strings"
 )
 
 // CreateSubject creates a new subject
@@ -79,6 +82,32 @@ func GetSubjects(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allSubjects)
+}
+
+// GetSubject returns a single subject
+func GetSubject(w http.ResponseWriter, r *http.Request) {
+	db := database.Connect(dbName)
+
+	stmt, err := db.Prepare("SELECT * FROM subjects WHERE id = ?")
+	if err != nil {
+		panic(err)
+	}
+
+	subject := Subject{}
+	urlPaths := strings.Split(r.URL.Path, "/")
+	lastPath := urlPaths[len(urlPaths)-1]
+
+	err = stmt.QueryRow(lastPath).Scan(&subject.ID, &subject.Name, &subject.CategoryID)
+	if err != nil {
+		utils.NotFound(w, errors.New("Subject "+lastPath+" does not exist"))
+		return
+	}
+
+	defer stmt.Close()
+
+	defer db.Close()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(subject)
 }
 
 type Subject struct {
