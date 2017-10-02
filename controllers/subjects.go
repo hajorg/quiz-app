@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"quiz-app/database"
 	"quiz-app/utils"
@@ -20,19 +18,7 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 		"name":        "",
 		"category_id": "",
 	}
-
-	if len(r.Form) > 0 {
-		subject["category_id"] = r.FormValue("category_id")
-		subject["name"] = r.FormValue("name")
-	} else {
-		body, err := ioutil.ReadAll(r.Body)
-
-		if err != nil {
-			fmt.Fprintln(w, err)
-		}
-		defer r.Body.Close()
-		json.Unmarshal(body, &subject)
-	}
+	subject = utils.RequestData(r, w)
 
 	validationError := validation.Validator(w, subject, map[string](map[string]string){
 		"name": {
