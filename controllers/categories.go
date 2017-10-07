@@ -38,3 +38,10 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(201)
 	json.NewEncoder(w).Encode(category)
 }
+
+// GetCategories gets all categories from the database
+func GetCategories(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	data := database.GetAll("categories")
+	json.NewEncoder(w).Encode(data)
+}

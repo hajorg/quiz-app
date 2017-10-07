@@ -86,6 +86,12 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 			Pattern: baseURL + "/subject/" + numReg.FindString(lastPath),
 			Method:  "GET",
 		},
+		Route{
+			Name:    "category",
+			Handler: controllers.GetCategories,
+			Pattern: baseURL + "/category",
+			Method:  "GET",
+		},
 	}
 
 	for _, route := range routes {

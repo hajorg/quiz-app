@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strconv"
 )
 
 // Connect connects to the local database
@@ -71,4 +72,65 @@ func Insert(table string, data map[string]interface{}) (int64, error) {
 	}
 	lastID, _ := result.LastInsertId()
 	return lastID, nil
+}
+
+func GetAll(table string) []map[string]interface{} {
+	db := Connect(dbName)
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM " + table)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	// get table columns
+	columns, err := rows.Columns()
+	if err != nil {
+		panic(err)
+	}
+	// placeholder of result from the database
+	// data := []interface{}{}
+	data := make([]interface{}, len(columns))
+	// an array of the results to be gotten from the db
+	newData := make([]map[string]interface{}, 0)
+	// holds the address of each interface{} value in the data slice
+	scanArgs := make([]interface{}, len(columns))
+	for i := range data {
+		scanArgs[i] = &data[i]
+	}
+
+	for {
+		if rows.Next() {
+			err = rows.Scan(scanArgs...)
+			if err != nil {
+				panic(err)
+			}
+			entry := make(map[string]interface{})
+			for i, col := range columns {
+				val, ok := data[i].([]byte)
+				if ok {
+					entry[col] = string(val)
+				} else {
+					entry[col] = val
+				}
+				// convert from interface to string, float, boolean etc
+				switch value := entry[col].(type) {
+				case string:
+					if boolean, err := strconv.ParseBool(value); err == nil {
+						entry[col] = boolean
+					}
+
+					if val, err := strconv.ParseFloat(value, 64); err == nil {
+						entry[col] = val
+					}
+				}
+			}
+			newData = append(newData, entry)
+		} else {
+			break
+		}
+	}
+
+	return newData
 }
