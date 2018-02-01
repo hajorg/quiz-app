@@ -69,7 +69,8 @@ func CreateDatabase(name string) {
 			subject_id INT NOT NULL,
 			FOREIGN KEY (subject_id) REFERENCES subjects(id),
 			user_id INT NOT NULL,
-			FOREIGN KEY (user_id) REFERENCES user(id)
+			FOREIGN KEY (user_id) REFERENCES user(id),
+			score INT NOT NULL
 		)`)
 	if err != nil {
 		panic(err)

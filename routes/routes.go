@@ -26,6 +26,7 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 	numReg, _ := regexp.Compile("\\d+")
 	urlPaths := strings.Split(r.RequestURI, "/")
 	lastPath := urlPaths[len(urlPaths)-1]
+	secondToLastPath := urlPaths[len(urlPaths)-2]
 
 	routes := routes{
 		Route{
@@ -68,6 +69,18 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 			Middleware: middlewares.AuthMiddleware(http.HandlerFunc(controllers.CreateQuestion)),
 		},
 		Route{
+			Name:    "questions",
+			Handler: controllers.GetQuestion,
+			Pattern: baseURL + "/question/" + numReg.FindString(lastPath),
+			Method:  "GET",
+		},
+		Route{
+			Name:    "questions",
+			Handler: controllers.GetQuestions,
+			Pattern: baseURL + "/questions",
+			Method:  "GET",
+		},
+		Route{
 			Name:       "options",
 			Handler:    controllers.CreateOption,
 			Pattern:    baseURL + "/option",
@@ -91,6 +104,24 @@ func Routers(w http.ResponseWriter, r *http.Request) {
 			Handler: controllers.GetCategories,
 			Pattern: baseURL + "/category",
 			Method:  "GET",
+		},
+		Route{
+			Name:    "option",
+			Handler: controllers.GetOptions,
+			Pattern: baseURL + "/option",
+			Method:  "GET",
+		},
+		Route{
+			Name:    "option",
+			Handler: controllers.GetQuestionOptions,
+			Pattern: baseURL + "/questions/" + numReg.FindString(secondToLastPath) + "/options",
+			Method:  "GET",
+		},
+		Route{
+			Name:    "results",
+			Handler: controllers.Results,
+			Pattern: baseURL + "/results",
+			Method:  "POST",
 		},
 	}
 

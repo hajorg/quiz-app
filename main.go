@@ -3,19 +3,18 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"quiz-app/database"
 	"quiz-app/routes"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
-	database.CreateDatabase("quiz")
+	// database.CreateDatabase("quiz")
 }
 
 func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", routes.Routers)
-	fmt.Println(http.ListenAndServe(":8080", mux))
+	fmt.Println(http.ListenAndServe(":8081", mux))
 }

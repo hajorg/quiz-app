@@ -6,9 +6,10 @@ import (
 	"quiz-app/database"
 	"quiz-app/utils"
 	"quiz-app/validation"
+	"strings"
 )
 
-// CreateOptions creates a single question
+// CreateOption creates a single question
 func CreateOption(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
@@ -35,4 +36,25 @@ func CreateOption(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(option)
+}
+
+// GetOptions gets all options
+func GetOptions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(database.GetAll("answers"))
+}
+
+// GetQuestionOptions gets all options for a question
+func GetQuestionOptions(w http.ResponseWriter, r *http.Request) {
+	urlPath := strings.Split(r.URL.Path, "/")
+	secondToLastPath := urlPath[len(urlPath)-2]
+	options := database.GetWhere("answers", []map[string]interface{}{
+		{
+			"question_id": secondToLastPath,
+		},
+	})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(options)
 }

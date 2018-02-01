@@ -26,3 +26,17 @@ func RequestData(r *http.Request, w http.ResponseWriter) map[string]interface{} 
 	}
 	return data
 }
+
+// ArrayRequestData holds array of form data
+func ArrayRequestData(r *http.Request, w http.ResponseWriter) []map[string]interface{} {
+	var data []map[string]interface{}
+	body, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+
+	defer r.Body.Close()
+	json.Unmarshal(body, &data)
+	return data
+}
