@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"quiz-app/database"
-	"quiz-app/routes"
+
+	"github.com/quiz-app/routes"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
-	database.CreateDatabase("quiz")
+	// database.CreateDatabase("quiz")
 }
 
 func main() {

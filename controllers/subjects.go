@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"quiz-app/database"
-	"quiz-app/utils"
-	"quiz-app/validation"
 	"strconv"
 	"strings"
+
+	"github.com/quiz-app/database"
+	"github.com/quiz-app/utils"
+	"github.com/quiz-app/validation"
 )
 
 // CreateSubject creates a new subject

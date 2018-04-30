@@ -4,8 +4,9 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"quiz-app/utils"
 	"testing"
+
+	"github.com/quiz-app/utils"
 )
 
 func TestAuthMiddlewareSuccess(t *testing.T) {

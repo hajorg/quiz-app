@@ -20,7 +20,7 @@ func init() {
 
 // Connect connects to the local database
 func Connect(name string) *sql.DB {
-	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/"+name)
+	db, err := sql.Open("mysql", "root:guesswho@tcp(127.0.0.1:3306)/"+name)
 	if err != nil {
 		log.Fatal(err)
 	}

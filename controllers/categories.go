@@ -3,9 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"quiz-app/database"
-	"quiz-app/utils"
-	"quiz-app/validation"
+
+	"github.com/quiz-app/utils"
+
+	"github.com/quiz-app/database"
+	"github.com/quiz-app/validation"
 )
 
 // CreateCategory creates new category
