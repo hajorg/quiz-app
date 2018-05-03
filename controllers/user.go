@@ -43,15 +43,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	notFound := []string{}
 
 	// check if required keys are passed
-	for _, val := range checkData {
+	for key := range newUser {
 		seen := false
-		for key := range newUser {
+		for _, val := range checkData {
 			if val == key {
 				seen = true
+				break
 			}
 		}
 		if seen != true {
-			notFound = append(notFound, val)
+			notFound = append(notFound, key)
 		}
 	}
 
@@ -60,7 +61,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			Error: strings.Join(notFound, ", ") + " is/are required",
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnprocessableEntity)
 
 		json.NewEncoder(w).Encode(error)
 		return
