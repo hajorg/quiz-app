@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"quiz-app/routes"
-	"quiz-app/utils"
 	"strings"
 	"testing"
+
+	"github.com/quiz-app/routes"
+	"github.com/quiz-app/utils"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"

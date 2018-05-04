@@ -3,11 +3,12 @@ package controllers_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"quiz-app/controllers"
-	"quiz-app/database"
-	"quiz-app/utils"
 	"strings"
 	"testing"
+
+	"github.com/quiz-app/controllers"
+	"github.com/quiz-app/database"
+	"github.com/quiz-app/utils"
 
 	_ "github.com/go-sql-driver/mysql"
 )

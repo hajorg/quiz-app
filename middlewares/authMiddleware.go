@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"quiz-app/utils"
 	"strings"
+
+	"github.com/quiz-app/utils"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"

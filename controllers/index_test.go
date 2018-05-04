@@ -3,8 +3,9 @@ package controllers_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"quiz-app/controllers"
 	"testing"
+
+	"github.com/quiz-app/controllers"
 )
 
 func TestIndex(t *testing.T) {

@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"quiz-app/utils"
 	"regexp"
 	"strconv"
+
+	"github.com/quiz-app/utils"
 )
 
 // Validator validates the request body(data) and writes to w if err

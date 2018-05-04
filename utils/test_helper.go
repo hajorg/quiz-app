@@ -2,12 +2,13 @@ package utils
 
 import (
 	"database/sql"
-	"quiz-app/database"
+
+	"github.com/quiz-app/database"
 )
 
 // DbTestInit Creates a new db connection for test
 func DbTestInit() *sql.DB {
-	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/")
+	db, err := sql.Open("mysql", "root:guesswho@tcp(127.0.0.1:3306)/")
 	if err != nil {
 		panic(err)
 	}

@@ -5,10 +5,12 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"quiz-app/database"
-	"quiz-app/utils"
-	"quiz-app/validation"
+	"strings"
 	"time"
+
+	"github.com/quiz-app/database"
+	"github.com/quiz-app/utils"
+	"github.com/quiz-app/validation"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -37,6 +39,34 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// holds form data
 	newUser := utils.RequestData(r, w)
 
+	checkData := [3]string{"username", "email", "password"}
+	notFound := []string{}
+
+	// check if required keys are passed
+	for key := range newUser {
+		seen := false
+		for _, val := range checkData {
+			if val == key {
+				seen = true
+				break
+			}
+		}
+		if seen != true {
+			notFound = append(notFound, key)
+		}
+	}
+
+	if len(notFound) > 0 {
+		error := utils.Error{
+			Error: strings.Join(notFound, ", ") + " is/are required",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+
+		json.NewEncoder(w).Encode(error)
+		return
+	}
+
 	validationError := validation.Validator(w, newUser, map[string](map[string]string){
 		"username": {
 			"required": "1",
@@ -62,6 +92,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+
 	newUser["password"] = hashedPassword
 	newUser["created_at"] = time.Now()
 	newUser["updated_at"] = time.Now()

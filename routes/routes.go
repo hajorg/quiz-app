@@ -2,10 +2,11 @@ package routes
 
 import (
 	"net/http"
-	"quiz-app/controllers"
-	"quiz-app/middlewares"
 	"regexp"
 	"strings"
+
+	"github.com/quiz-app/controllers"
+	"github.com/quiz-app/middlewares"
 )
 
 // Route holds required data to match an incoming request

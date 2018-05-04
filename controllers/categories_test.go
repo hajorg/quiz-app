@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"quiz-app/controllers"
-	"quiz-app/utils"
 	"strings"
 	"testing"
+
+	"github.com/quiz-app/utils"
+
+	"github.com/quiz-app/controllers"
 
 	_ "github.com/go-sql-driver/mysql"
 )
